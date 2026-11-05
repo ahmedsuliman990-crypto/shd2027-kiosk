@@ -1,3 +1,6 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0a09">
 <title>Sharjah Heritage Days 2027 · Gate Kiosk</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -130,13 +133,13 @@ button:focus-visible{outline:2px solid var(--text);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){.you-pulse,.route-line,.idle img{animation:none}}
 /* phone: the screen comes first and fills the width; the rig controls follow below */
 @media (max-width:760px){
-  body{padding-top:10px}
-  .wrap{gap:16px}
-  .kiosk-col{order:-1;width:100%}
-  .bezel{padding:6px;border-radius:20px}
-  .screen{width:min(calc(100vw - 44px),calc((100svh - 30px) * 9 / 16))}
+  body{padding:0}
+  .wrap{gap:0}
+  .kiosk-col{order:-1;width:100%;gap:0}
+  .bezel{padding:0;border-radius:0;background:none}
+  .screen{width:min(100vw,calc(100svh * 9 / 16));border-radius:0;margin:0 auto}
   .cap{display:none}
-  .rig{flex:1 1 100%;padding:18px}
+  .rig{flex:1 1 100%;margin:16px;padding:18px}
 }
 </style>
 
