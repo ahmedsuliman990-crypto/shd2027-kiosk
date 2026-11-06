@@ -315,9 +315,25 @@ function fitRoute(){const r=pathTo(G(),st(sel));const pts=r.pts.map(p=>rp(p[0],p
 function setView(){map.setAttribute("viewBox",`${view.x} ${view.y} ${view.w} ${view.h}`)}
 function zoom(f){const cx=view.x+view.w/2,cy=view.y+view.h/2,w=Math.min(1800,Math.max(320,view.w*f)),h=w*1260/1350;animateTo({x:cx-w/2,y:cy-h/2,w,h})}
 $("zin").onclick=()=>zoom(.72);$("zout").onclick=()=>zoom(1.38);
-let drag=null;map.addEventListener("pointerdown",e=>{drag={x:e.clientX,y:e.clientY,v:{...view},moved:false}});
-window.addEventListener("pointermove",e=>{if(!drag)return;const k=view.w/map.clientWidth;view.x=drag.v.x-(e.clientX-drag.x)*k;view.y=drag.v.y-(e.clientY-drag.y)*k;setView()});
-window.addEventListener("pointerup",()=>drag=null);
+/* drag with one finger, pinch with two (zooms around the fingers) */
+const touches=new Map();let drag=null,pinch=null,dragged=false;
+function startDrag(p){drag={x:p.x,y:p.y,v:{...view}}}
+map.addEventListener("pointerdown",e=>{touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(touches.size===1){dragged=false;startDrag(touches.get(e.pointerId))}
+ else if(touches.size===2){drag=null;const [a,b]=[...touches.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),m:{x:(a.x+b.x)/2,y:(a.y+b.y)/2},v:{...view}};dragged=true}});
+window.addEventListener("pointermove",e=>{if(!touches.has(e.pointerId))return;touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ const r=map.getBoundingClientRect();
+ if(pinch&&touches.size>=2){const [a,b]=[...touches.values()];const d=Math.max(1,Math.hypot(a.x-b.x,a.y-b.y)),m={x:(a.x+b.x)/2,y:(a.y+b.y)/2},v0=pinch.v;
+  const w=Math.min(1800,Math.max(320,v0.w*pinch.d/d)),h=w*1260/1350,k0=v0.w/r.width,k=w/r.width;
+  const px=v0.x+(pinch.m.x-r.left)*k0,py=v0.y+(pinch.m.y-r.top)*k0;
+  view={x:px-(m.x-r.left)*k,y:py-(m.y-r.top)*k,w,h};setView();return}
+ if(!drag)return;if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>6)dragged=true;
+ const k=view.w/r.width;view.x=drag.v.x-(e.clientX-drag.x)*k;view.y=drag.v.y-(e.clientY-drag.y)*k;setView()});
+function lift(e){if(!touches.has(e.pointerId))return;touches.delete(e.pointerId);
+ if(pinch&&touches.size<2){pinch=null;animateTo({...view});if(touches.size===1)startDrag([...touches.values()][0])}
+ else if(!touches.size)drag=null}
+window.addEventListener("pointerup",lift);window.addEventListener("pointercancel",lift);
+map.addEventListener("click",e=>{if(dragged){e.stopPropagation();e.preventDefault();dragged=false}},true);
 map.addEventListener("wheel",e=>{e.preventDefault();zoom(e.deltaY>0?1.12:.9)},{passive:false});
 
 /* ---- panel ---- */
