@@ -1,26 +1,28 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0b0a09">
+<meta name="theme-color" content="#783D26">
 <title>Sharjah Heritage Days 2027 · Gate Kiosk</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
 <style>
-/* face = warm near-black ground + heritage gold as the one data hue.
+/* SHD brand sheet: brown ground, black surfaces, sand text, ochre as the one data hue.
    Kiosk 9:16: top bar, Rashid line, arched map window (signature element), lower panel. Elevation by lightness only. */
 :root{
   color-scheme:dark;
-  --ground:#0e0d0c; --surface:#181716; --raised:#2a2826; --rule:#1f1d1b; --control:#444240;
-  --text:#ffffff; --muted:#b4b4b4; --faint:#949494;
-  --accent:#e8b04b;               /* the one data hue: route, destination, you are here */
-  --map-ground:#151311; --map-block:#34302a; --map-road:#34302a; --map-event:#221f1b; --map-zone:#4b4239; --map-zone-hi:#6e604d; --map-loop:#6a5f50;
-  --pin-fill:#2b2723; --pin-line:#6d6458; --pin-ink:#ece6dc;
-  --gold-ink:#f0c36a; --gold-soft:#2e2414;
+  /* SHD brand palette, strictly: brown #783D26, ochre #AD7838, sand #EDE0CD, plus black and white */
+  --brown:#783D26; --ochre:#AD7838; --sand:#EDE0CD;
+  --ground:#783D26; --surface:#000000; --raised:#783D26; --rule:#783D26; --control:#AD7838;
+  --text:#EDE0CD; --muted:#EDE0CD; --faint:#EDE0CD;
+  --accent:#AD7838;               /* the one data hue: route, destination, you are here */
+  --map-ground:#000000; --map-block:#000000; --map-road:#783D26; --map-event:#000000; --map-zone:#783D26; --map-zone-hi:#AD7838; --map-loop:#783D26;
+  --pin-fill:#000000; --pin-line:#AD7838; --pin-ink:#EDE0CD;
+  --gold-ink:#EDE0CD; --gold-soft:#783D26;
   --star:polygon(50% 0%,61.5% 22.3%,85.4% 14.6%,77.7% 38.5%,100% 50%,77.7% 61.5%,85.4% 85.4%,61.5% 77.7%,50% 100%,38.5% 77.7%,14.6% 85.4%,22.3% 61.5%,0% 50%,22.3% 38.5%,14.6% 14.6%,38.5% 22.3%);
   --radius-card:20px; --radius-control:999px;
   --ui:"Inter","IBM Plex Sans Arabic",system-ui,"Segoe UI",Tahoma,sans-serif;
   /* rig page */
-  --page:#070707; --rig:#121110; --rig-raised:#1c1b19;
+  --page:#000000; --rig:#783D26; --rig-raised:#000000;
 }
 [hidden]{display:none!important}
 html,body{height:100%}
@@ -72,7 +74,7 @@ button:focus-visible{outline:2px solid var(--text);outline-offset:2px}
 /* lower panel */
 .panel{flex:1;min-height:0;display:flex;flex-direction:column;gap:2.6cqw;padding:3.6cqw 5cqw 4.4cqw}
 .tabs{display:flex;gap:1.6cqw}
-.tabs button{border:none;background:none;border-radius:var(--radius-control);padding:1.6cqw 3.6cqw;font-size:3cqw;font-weight:500;color:#bbb;cursor:pointer}
+.tabs button{border:none;background:none;border-radius:var(--radius-control);padding:1.6cqw 3.6cqw;font-size:3cqw;font-weight:500;color:var(--text);cursor:pointer}
 .tabs button[aria-selected="true"]{background:var(--accent);color:#000}
 .cats{display:grid;grid-template-columns:repeat(7,1fr);gap:1.4cqw;flex:0 0 auto}
 .cat{border:none;background:var(--surface);border-radius:3.6cqw;padding:2.2cqw .4cqw 1.8cqw;display:flex;flex-direction:column;align-items:center;gap:1cqw;color:var(--muted);cursor:pointer;min-width:0}
@@ -87,16 +89,16 @@ button:focus-visible{outline:2px solid var(--text);outline-offset:2px}
 .row:active{background:var(--raised)}
 .row .n{width:7cqw;aspect-ratio:1;display:grid;place-items:center;clip-path:var(--star);background:var(--gold-soft);font-size:2.8cqw;font-weight:600;color:var(--gold-ink);font-variant-numeric:tabular-nums}
 .row .p{display:block;font-size:3.3cqw;font-weight:500;line-height:1.3}
-.row .s{display:block;font-size:2.4cqw;color:var(--faint);margin-top:.2cqw}
-.row .m{font-size:3cqw;color:var(--gold-ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.row .s{display:block;font-size:2.4cqw;color:var(--accent);margin-top:.2cqw}
+.row .m{font-size:3cqw;color:var(--accent);font-variant-numeric:tabular-nums;white-space:nowrap}
 .row[aria-current="true"]{background:var(--raised)}
-.row .n.mq{clip-path:none;border-radius:50%;background:#1f2b27;color:#9cc7b8}
+.row .n.mq{clip-path:none;border-radius:50%;background:var(--brown);color:var(--sand)}
 .row .n.mq svg{width:4.4cqw;height:4.4cqw}
 .row[aria-current="true"] .n{background:var(--accent);color:#000}
 /* route summary: the answer, under the map, never over it */
 .route{display:grid;grid-template-columns:auto 1fr;gap:1cqw 4cqw;align-items:end;background:var(--surface);border-radius:var(--radius-card);padding:3.6cqw 4.4cqw}
 .route .fig{grid-row:span 2;font-size:13cqw;font-weight:600;line-height:.9;font-variant-numeric:tabular-nums;color:var(--accent)}
-.route .fig small{display:block;font-size:2.8cqw;font-weight:500;color:var(--muted);margin-top:1.4cqw}
+.route .fig small{display:block;font-size:2.8cqw;font-weight:500;color:var(--accent);margin-top:1.4cqw}
 .route .t{font-size:4.2cqw;font-weight:600;line-height:1.2}
 .route .d{font-size:2.7cqw;color:var(--muted);line-height:1.5}
 .route .b{grid-column:1 / -1;font-size:3cqw;line-height:1.55;color:var(--text);margin-top:2.4cqw}
@@ -114,7 +116,7 @@ button:focus-visible{outline:2px solid var(--text);outline-offset:2px}
 .stamps span.on{background:var(--accent);color:#000;font-weight:600}
 .ev{grid-template-columns:12cqw 1fr auto}
 .ev .tm{font-size:3.2cqw;font-weight:600;font-variant-numeric:tabular-nums}
-.live{font-size:2.3cqw;background:#2b2414;color:var(--accent);border-radius:var(--radius-control);padding:.6cqw 2cqw}
+.live{font-size:2.3cqw;background:var(--brown);color:var(--sand);border-radius:var(--radius-control);padding:.6cqw 2cqw}
 .sample{font-size:2.3cqw;color:var(--faint);text-align:center;padding-top:1cqw}
 /* reach mode: everything moves down, the map shrinks */
 .screen.reach .hello{display:none}
@@ -241,15 +243,15 @@ function rp(x,y){const r=rot()*Math.PI/180,cx=675,cy=630,dx=x-cx,dy=y-cy;return[
 function drawMap(){
  map.innerHTML="";gRoot=el("g",{transform:`rotate(${rot()} 675 630)`});
  el("rect",{x:-800,y:-800,width:2950,height:2860,fill:css("--map-ground")},gRoot);
- D.ground.forEach(g=>el("polygon",{points:P(g),fill:css("--map-event")},gRoot));
- const bl=el("g",{},gRoot);D.blds.forEach(b=>el("polygon",{points:P(b),fill:css("--map-block"),stroke:css("--map-ground"),"stroke-width":2,"stroke-linejoin":"round"},bl));
+ D.ground.forEach(g=>el("polygon",{points:P(g),fill:css("--map-event"),stroke:css("--sand"),"stroke-width":3,"stroke-linejoin":"round"},gRoot));
+ const bl=el("g",{},gRoot);D.blds.forEach(b=>el("polygon",{points:P(b),fill:css("--map-block"),stroke:css("--brown"),"stroke-width":2.5,"stroke-linejoin":"round"},bl));
  const gz=el("g",{},gRoot);
  D.zones.forEach(z=>{const s=st(z.s);const on=sel===s.n,hi=cat!=="all"&&s.c===cat;
-   el("polygon",{points:P(z.pts),fill:on?css("--accent"):hi?css("--map-zone-hi"):css("--map-zone"),stroke:css("--map-ground"),"stroke-width":4,"stroke-linejoin":"round",style:"cursor:pointer"},gz).addEventListener("click",()=>select(s.n))});
+   el("polygon",{points:P(z.pts),fill:on?css("--sand"):hi?css("--map-zone-hi"):css("--map-zone"),stroke:css("--map-ground"),"stroke-width":4,"stroke-linejoin":"round",style:"cursor:pointer"},gz).addEventListener("click",()=>select(s.n))});
  D.loops.forEach(l=>el("polyline",{points:P([...l,l[0]]),fill:"none",stroke:showLoop?css("--accent"):css("--map-loop"),"stroke-width":showLoop?9:5,"stroke-linejoin":"round","stroke-dasharray":showLoop?"":"10 10"},gRoot));
  /* Al Soor wall, with the new opening by G4 */
- D.wall_parts.forEach(w=>{el("polyline",{points:P(w),fill:"none",stroke:"#0b0a09","stroke-width":13,"stroke-linecap":"square","stroke-linejoin":"round"},gRoot);
- el("polyline",{points:P(w),fill:"none",stroke:"#8C7F6C","stroke-width":3,"stroke-dasharray":"2 7","stroke-linecap":"round"},gRoot)});
+ D.wall_parts.forEach(w=>{el("polyline",{points:P(w),fill:"none",stroke:css("--brown"),"stroke-width":13,"stroke-linecap":"square","stroke-linejoin":"round"},gRoot);
+ el("polyline",{points:P(w),fill:"none",stroke:css("--sand"),"stroke-width":3,"stroke-dasharray":"2 7","stroke-linecap":"round"},gRoot)});
  gRoute=el("g",{},gRoot);
  gTop=el("g",{});           // upright layer: pins, gates and labels are placed in rotated coordinates, never rotated
  drawRoute();drawPins();
@@ -260,7 +262,7 @@ function pin(x,y,txt,opt={}){const [X,Y]=rp(x,y);const g=el("g",{style:"cursor:p
  const t=el("text",{x:X,y:Y+fs*.36,"text-anchor":"middle","font-size":fs,"font-weight":600,fill:opt.ink||css("--pin-ink"),"font-family":"Inter,IBM Plex Sans Arabic,system-ui,sans-serif"},g);t.textContent=txt;return g}
 function tag(x,y,lines,clear){const [X,Y]=rp(x,y);const k=ps,g=el("g",{},gTop);
  const r=el("rect",{fill:css("--text"),rx:20*k},g);const t=el("text",{x:X,y:Y,"text-anchor":"middle","font-family":"Inter,IBM Plex Sans Arabic,system-ui,sans-serif",fill:"#000"},g);
- lines.forEach((ln,i)=>{const s=el("tspan",{x:X,dy:i?30*k:0,"font-size":(i?21:25)*k,"font-weight":i?400:600},t);s.textContent=ln;if(i)s.setAttribute("fill","#555")});
+ lines.forEach((ln,i)=>{const s=el("tspan",{x:X,dy:i?30*k:0,"font-size":(i?21:25)*k,"font-weight":i?400:600},t);s.textContent=ln;if(i)s.setAttribute("fill",css("--brown"))});
  const b=t.getBBox(),px=18*k,py=11*k,tip=12*k;r.setAttribute("x",b.x-px);r.setAttribute("y",b.y-py);r.setAttribute("width",b.width+2*px);r.setAttribute("height",b.height+2*py);
  const by=b.y+b.height+py;el("polygon",{points:`${X-tip},${by-1} ${X+tip},${by-1} ${X},${by+tip}`,fill:css("--text")},g);
  g.setAttribute("transform",`translate(0 ${Y-clear*k-6*k-(by+tip)})`);return g}
@@ -273,8 +275,8 @@ function zoneTags(){const t=lang==="ar";
   el("circle",{cx:X,cy:Y,r:11*ps,fill:css("--text"),stroke:css("--ground"),"stroke-width":3*ps},g);
   el("path",{d:`M${X-4.5*ps},${Y+4.5*ps} L${X+4*ps},${Y-4*ps} M${X-2*ps},${Y-4*ps} H${X+4*ps} V${Y+2*ps}`,fill:"none",stroke:"#000","stroke-width":2.2*ps,"stroke-linecap":"round","stroke-linejoin":"round"},g)})}
 function mqpin(x,y,hi,on){const [X,Y]=rp(x,y);const g=el("g",{style:"cursor:pointer"},gTop);const r=(on?24:hi?19:15)*ps;
- el("circle",{cx:X,cy:Y,r,fill:on?css("--accent"):hi?"#2c4a40":"#22312c",stroke:on?css("--ground"):"#6f9c8c","stroke-width":(on?4:2)*ps},g);
- const s=r*1.25/24;const ic=el("g",{transform:`translate(${X-12*s},${Y-12*s}) scale(${s})`,color:on?"#000":"#cfe3db"},g);ic.innerHTML=CRES;return g}
+ el("circle",{cx:X,cy:Y,r,fill:on?css("--accent"):hi?css("--brown"):"#000000",stroke:on?css("--ground"):css("--ochre"),"stroke-width":(on?4:2)*ps},g);
+ const s=r*1.25/24;const ic=el("g",{transform:`translate(${X-12*s},${Y-12*s}) scale(${s})`,color:on?"#000":css("--sand")},g);ic.innerHTML=CRES;return g}
 function drawPins(){
  gTop.innerHTML="";const t=T[lang];
  zoneTags();const gL=el("g",{},gTop);
