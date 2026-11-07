@@ -135,8 +135,14 @@ button:focus-visible{outline:2px solid var(--text);outline-offset:2px}
 @keyframes yp{0%{transform:scale(.7);opacity:.8}100%{transform:scale(2.6);opacity:0}}
 .route-line{stroke-dasharray:16 12;animation:dash 1.1s linear infinite}
 @keyframes dash{to{stroke-dashoffset:-28}}
+/* selected category: soft radar rings around its stations */
+.cat-ring{fill:none;stroke:var(--accent);transform-box:fill-box;transform-origin:center;opacity:0;animation:ring 2.8s ease-out infinite}
+.cat-ring.b{animation-delay:1.4s}
+@keyframes ring{0%{transform:scale(.9);opacity:.5}100%{transform:scale(2);opacity:0}}
+@media (prefers-reduced-motion:reduce){.cat-ring{animation:none;opacity:.35;transform:scale(1.25)}.cat-ring.b{display:none}}
 /* gate picker: shown on first open and after the idle screen */
-.gatepick{position:absolute;inset:0;z-index:6;background:var(--ground);display:flex;flex-direction:column;padding:8cqw 5cqw 6cqw;gap:3.6cqw}
+.gatepick.out{opacity:0;transform:scale(1.03)}
+.gatepick{transition:opacity .32s ease,transform .32s ease;position:absolute;inset:0;z-index:6;background:var(--ground);display:flex;flex-direction:column;padding:8cqw 5cqw 6cqw;gap:3.6cqw}
 .gp-head{display:flex;align-items:center;gap:3.4cqw}
 .gp-head .face{width:16cqw;height:16cqw}
 .gp-head b{display:block;font-size:6.4cqw;font-weight:600;line-height:1.2}
@@ -317,10 +323,11 @@ function drawPins(){
  gTop.innerHTML="";const t=T[lang];
  zoneTags();const gL=el("g",{},gTop);
  D.stations.forEach(s=>{if(s.n===sel)return;const dim=cat!=="all"&&s.c!==cat;
+   if(cat!=="all"&&s.c===cat){const [X,Y]=rp(s.x,s.y);["a","b"].forEach(c=>el("circle",{cx:X,cy:Y,r:(isMq(s)?17:24)*ps,"stroke-width":2*ps,class:"cat-ring "+c},gTop))}
    if(isMq(s)){const p=mqpin(s.x,s.y,cat==="mosque");p.addEventListener("click",()=>select(s.n));return}
    const p=pin(s.x,s.y,s.n,dim?{stroke:css("--map-loop"),ink:css("--faint"),sw:1.6}:{});p.addEventListener("click",()=>select(s.n));if(dim)p.setAttribute("opacity",.55)});
  labels(gL);
- D.gates.forEach(g=>{if(g.id===gate)return;const p=pin(g.x,g.y,g.id,{fill:css("--raised"),ink:css("--text"),fs:17,round:true});p.addEventListener("click",()=>setGate(g.id))});
+ D.gates.forEach(g=>{if(g.id===gate)return;const p=pin(g.x,g.y,g.id,{fill:css("--raised"),ink:css("--text"),fs:17,round:true});p.addEventListener("click",()=>setGate(g.id,true))});
  const g=G();const [X,Y]=rp(g.x,g.y);
  el("circle",{cx:X,cy:Y,r:16*ps,fill:css("--accent"),class:"you-pulse"},gTop);
  el("circle",{cx:X,cy:Y,r:14*ps,fill:css("--accent"),stroke:css("--ground"),"stroke-width":5*ps},gTop);
@@ -343,8 +350,10 @@ function labels(gL){if(cat==="all"&&vw>=1000)return;
 function drawRoute(){gRoute.innerHTML="";if(!sel)return;const r=pathTo(G(),st(sel));
  el("polyline",{points:P(r.pts),fill:"none",stroke:css("--accent"),"stroke-width":11,"stroke-linecap":"round","stroke-linejoin":"round",class:"route-line"},gRoute)}
 /* camera: fit the route, animate the viewBox */
-let anim,ps=1.9,vw=1350;function animateTo(v){vw=v.w;ps=Math.min(2,Math.max(.7,v.w/700));if(gTop)drawPins();cancelAnimationFrame(anim);const from={...view},t0=performance.now(),dur=matchMedia("(prefers-reduced-motion: reduce)").matches?0:520;
- const step=now=>{const k=dur?Math.min(1,(now-t0)/dur):1,e=1-Math.pow(1-k,3);for(const q in view)view[q]=from[q]+(v[q]-from[q])*e;setView();if(k<1)anim=requestAnimationFrame(step)};anim=requestAnimationFrame(step)}
+let anim,ps=1.9,vw=1350;const RM=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
+const EASE={out:k=>1-Math.pow(1-k,3),inout:k=>k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2};
+function animateTo(v,d=520,ease="out"){vw=v.w;ps=Math.min(2,Math.max(.7,v.w/700));if(gTop)drawPins();cancelAnimationFrame(anim);const from={...view},t0=performance.now(),dur=RM()?0:d,E=EASE[ease];
+ const step=now=>{const k=dur?Math.min(1,(now-t0)/dur):1,e=E(k);for(const q in view)view[q]=from[q]+(v[q]-from[q])*e;setView();if(k<1)anim=requestAnimationFrame(step)};anim=requestAnimationFrame(step)}
 function fitPts(pts,pad,minW){let x0=Math.min(...pts.map(p=>p[0]))-pad,x1=Math.max(...pts.map(p=>p[0]))+pad,y0=Math.min(...pts.map(p=>p[1]))-pad*1.5,y1=Math.max(...pts.map(p=>p[1]))+pad;
  let w=Math.max(x1-x0,minW),h=w*1260/1350;if(y1-y0>h){h=y1-y0;w=h*1350/1260}const cx=(x0+x1)/2,cy=(y0+y1)/2;animateTo({x:cx-w/2,y:cy-h/2,w,h})}
 function fitCat(){if(cat==="all")return animateTo({...HOME});const pts=D.stations.filter(s=>s.c===cat).map(s=>rp(s.x,s.y));if(cat==="mosque")pts.push(rp(G().x,G().y));fitPts(pts,150,640)}
@@ -419,7 +428,15 @@ function homeLabel(){const ar=lang==="ar",arrow=`<svg viewBox="0 0 24 24" aria-h
  $("homeBtn").innerHTML=arrow+(isHome()?(ar?"تغيير البوابة":"Change gate"):(ar?"الرئيسية":"Home"))}
 function select(n){sel=n;$("zoomBox").hidden=true;showLoop=false;tab="explore";drawMap();render();fitRoute();poke()}
 function clearSel(){sel=null;$("zoomBox").hidden=false;drawMap();render();fitCat()}
-function setGate(id){gate=id;document.querySelectorAll("#gateSeg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.g===id));drawMap();render();if(sel)fitRoute();else animateTo({...HOME})}
+/* arrival: start wide, glide in to the visitor's gate, pause on "you are here", then ease back out to the whole site */
+let fly=0;
+function flyToGate(){const my=++fly;if(RM()){animateTo({...HOME},0);return}
+ const W=HOME.w*1.3,H=HOME.h*1.3;view={x:HOME.x+HOME.w/2-W/2,y:HOME.y+HOME.h/2-H/2,w:W,h:H};setView();
+ const [X,Y]=rp(G().x,G().y),cw=600,ch=cw*1260/1350;
+ animateTo({x:X-cw/2,y:Y-ch*.55,w:cw,h:ch},1100,"inout");
+ setTimeout(()=>{if(my===fly&&!sel)animateTo({...HOME},1200,"inout")},1100+650)}
+map.addEventListener("pointerdown",()=>{fly++},true);
+function setGate(id,arrive){gate=id;document.querySelectorAll("#gateSeg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.g===id));drawMap();render();if(sel)fitRoute();else if(arrive)flyToGate();else animateTo({...HOME})}
 function setLang(l){lang=l;const sc=$("screen");sc.dir=l==="ar"?"rtl":"ltr";sc.lang=l;$("lang").textContent=l==="ar"?"English":"العربية";drawMap();render();if(typeof renderPicker==="function"&&$("gpText"))renderPicker()}
 
 /* ---- rig ---- */
@@ -440,7 +457,7 @@ function renderPicker(){
   b.innerHTML=`<span class="id">${g.id}</span><span class="ar">${ar?GATE_AR[g.id]:g.name}</span><span class="en">${ar?g.name:GATE_AR[g.id]}</span><span class="to">${ar?"← "+to[0]:"→ "+to[1]}</span>`;
   b.onclick=()=>pickGate(g.id);grid.appendChild(b)});
 }
-function pickGate(id){$("gatePick").hidden=true;clearSel();setGate(id);poke()}
+function pickGate(id){const gp=$("gatePick");gp.classList.add("out");setTimeout(()=>{gp.hidden=true;gp.classList.remove("out")},RM()?0:320);sel=null;$("zoomBox").hidden=false;setGate(id,true);poke()}
 (function buildPicker(){
  const svg=$("gpMap"),NS="http://www.w3.org/2000/svg",mk=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
  const pts=D.ground.flat().concat(D.gates.map(g=>[g.x,g.y]));const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);
