@@ -285,7 +285,7 @@ function pin(x,y,txt,opt={}){const [X,Y]=rp(x,y);const g=el("g",{style:"cursor:p
  if(opt.round)el("circle",{cx:X,cy:Y,r,fill:opt.fill||css("--surface")},g);else el("polygon",{points:star(X,Y,r*1.22),fill:opt.fill||css("--pin-fill"),stroke:opt.stroke||css("--pin-line"),"stroke-width":(opt.sw??2)*ps,"stroke-linejoin":"round"},g);
  const t=el("text",{x:X,y:Y+fs*.36,"text-anchor":"middle","font-size":fs,"font-weight":600,fill:opt.ink||css("--pin-ink"),"font-family":"Inter,IBM Plex Sans Arabic,system-ui,sans-serif"},g);t.textContent=txt;return g}
 function tag(x,y,lines,clear){const [X,Y]=rp(x,y);const k=ps,g=el("g",{},gTop);
- const r=el("rect",{fill:css("--text"),rx:20*k},g);const t=el("text",{x:X,y:Y,"text-anchor":"middle","font-family":"Inter,IBM Plex Sans Arabic,system-ui,sans-serif",fill:"#000"},g);
+ const r=el("rect",{fill:css("--text"),rx:20*k},g);const t=el("text",{x:X,y:Y,"text-anchor":"middle",direction:lang==="ar"?"rtl":"ltr","font-family":"Inter,IBM Plex Sans Arabic,system-ui,sans-serif",fill:"#000"},g);
  lines.forEach((ln,i)=>{const s=el("tspan",{x:X,dy:i?30*k:0,"font-size":(i?21:25)*k,"font-weight":i?400:600},t);s.textContent=ln;if(i)s.setAttribute("fill","#555")});
  const b=t.getBBox(),px=18*k,py=11*k,tip=12*k;r.setAttribute("x",b.x-px);r.setAttribute("y",b.y-py);r.setAttribute("width",b.width+2*px);r.setAttribute("height",b.height+2*py);
  const by=b.y+b.height+py;el("polygon",{points:`${X-tip},${by-1} ${X+tip},${by-1} ${X},${by+tip}`,fill:css("--text")},g);
