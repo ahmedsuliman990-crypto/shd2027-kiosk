@@ -107,6 +107,14 @@ button:focus-visible{outline:2px solid var(--text);outline-offset:2px}
 .route .b{grid-column:1 / -1;font-size:3cqw;line-height:1.55;color:var(--text);margin-top:2.4cqw}
 .route .tags{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:1.2cqw;margin-top:.6cqw}
 .route .tags span{background:var(--gold-soft);color:var(--gold-ink);border-radius:var(--radius-control);padding:.8cqw 2.4cqw;font-size:2.4cqw}
+.panel.sel{overflow-y:auto;scrollbar-width:none;overscroll-behavior:contain}
+.panel.sel::-webkit-scrollbar{display:none}
+.panel.sel{-webkit-mask-image:linear-gradient(#000 88%,transparent);mask-image:linear-gradient(#000 88%,transparent)}
+.panel.sel .list{flex:0 0 auto;overflow:visible}
+.route .backp{grid-column:1 / -1;justify-self:start;display:inline-flex;align-items:center;gap:1.2cqw;border:none;background:var(--raised);color:var(--text);border-radius:var(--radius-control);padding:1.5cqw 3.4cqw 1.5cqw 2.6cqw;font-size:2.7cqw;font-weight:500;cursor:pointer;margin-bottom:2cqw}
+.route .backp svg{width:2.8cqw;height:2.8cqw}
+.route .backp:active{background:var(--control)}
+.more{font-size:2.9cqw;font-weight:600;color:var(--muted);margin:1.4cqw .6cqw -0.6cqw}
 .route .acts{grid-column:1 / -1;display:flex;gap:1.6cqw;margin-top:2.4cqw}
 .btn{border:none;border-radius:var(--radius-control);padding:1.8cqw 4cqw;font-size:2.8cqw;font-weight:500;cursor:pointer;background:var(--raised)}
 .btn.primary{background:var(--text);color:#000}
@@ -238,6 +246,7 @@ const ICON={
  markets:'<path d="M5 9h14l-1.5 10h-11zM8.5 9a3.5 3.5 0 0 1 7 0" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>',
  exhibits:'<path d="M4 5h16v14H4zM7 15l3.5-4 3 3 2-2 2.5 3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>',
  mosque:'<path d="M14.5 4.2a8 8 0 1 0 0 15.6 6.4 6.4 0 1 1 0-15.6z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/><path d="M17.6 8.6l.7 1.6 1.7.2-1.3 1.1.4 1.7-1.5-.9-1.5.9.4-1.7-1.3-1.1 1.7-.2z" fill="currentColor"/>'};
+const CATS_DEF={shows:"العروض",museums:"المتاحف",pavilions:"الأجنحة واللجان",markets:"الأسواق",exhibits:"المعارض",mosque:"المساجد"};
 const CATS={shows:{ar:"عروض",en:"Shows"},museums:{ar:"متاحف",en:"Museums"},pavilions:{ar:"أجنحة ولجان",en:"Pavilions"},markets:{ar:"أسواق",en:"Markets"},exhibits:{ar:"معارض",en:"Exhibitions"},mosque:{ar:"مساجد",en:"Mosques"}};
 const GATE_AR={G1:"البوابة الشمالية",G2:"البوابة الغربية",G3:"البوابة الجنوبية",G4:"البوابة الشرقية"};
 const T={
@@ -390,12 +399,24 @@ function render(){
  const t=T[lang],g=G(),p=$("panel");say();p.innerHTML="";homeLabel();
  if(sel){const s=st(sel),r=pathTo(g,s);const way=r.passed.slice(0,3).map(o=>name(o)).join(lang==="ar"?"، ":", ");
   const box=document.createElement("div");box.className="route";
-  box.innerHTML=`<div class="fig">${mins(r.m)}<small>${t.min}</small></div><div class="t">${name(s)}</div>
+  const ar=lang==="ar",chev=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${ar?"M9 5l7 7-7 7":"M15 5l-7 7 7 7"}" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const backTo=cat!=="all"?(ar?CATS_DEF[cat]:CATS[cat].en.toLowerCase()):(ar?"كل الأماكن":"all places");
+  box.innerHTML=`<button class="backp" id="back">${chev}${ar?"رجوع إلى ":"Back to "}${backTo}</button><div class="fig">${mins(r.m)}<small>${t.min}</small></div><div class="t">${name(s)}</div>
    <div class="d">${CATS[s.c][lang]} · ${Math.round(r.m/10)*10} ${t.m}</div>
    <div class="b">${lang==="ar"?INFO[s.n].bar:INFO[s.n].ben}</div>
    <div class="tags">${(lang==="ar"?INFO[s.n].tar:INFO[s.n].ten).map(x=>`<span>${x}</span>`).join("")}</div>
-   <div class="acts"><button class="btn" id="back">${t.back}</button></div>`;
-  p.appendChild(box);$("back").onclick=clearSel;}
+`;
+  p.appendChild(box);$("back").onclick=clearSel;
+  /* more of the same kind, nearest first, so visitors can hop between them */
+  const others=D.stations.filter(x=>x.c===s.c&&x.n!==s.n);
+  if(others.length){const h=document.createElement("div");h.className="more";h.textContent=ar?"المزيد من "+CATS_DEF[s.c]:"More "+CATS[s.c].en.toLowerCase();p.appendChild(h);
+   const list=document.createElement("div");list.className="list";
+   others.map(x=>({s:x,m:pathTo(g,x).m})).sort((a,b)=>a.m-b.m).forEach(({s:x,m})=>{const b=document.createElement("button");b.className="row";
+    b.innerHTML=`<span class="n${isMq(x)?" mq":""}">${isMq(x)?`<svg viewBox="0 0 24 24">${CRES}</svg>`:x.n}</span><span><span class="p">${name(x)}</span><span class="s">${other(x)}</span></span><span class="m">${mins(m)} ${t.min}</span>`;
+    b.onclick=()=>{select(x.n);p.scrollTop=0};list.appendChild(b)});
+   p.appendChild(list)}
+  p.classList.add("sel");p.scrollTop=0;return}
+ p.classList.remove("sel");
  const tabs=document.createElement("div");tabs.className="tabs";tabs.setAttribute("role","tablist");
  [["explore",t.explore],["loop",t.loop],["now",t.now]].forEach(([k,lb])=>{const b=document.createElement("button");b.setAttribute("role","tab");b.setAttribute("aria-selected",tab===k);b.textContent=lb;b.onclick=()=>{tab=k;render()};tabs.appendChild(b)});
  if(!sel)p.appendChild(tabs);
